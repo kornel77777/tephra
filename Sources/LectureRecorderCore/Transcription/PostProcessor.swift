@@ -9,15 +9,21 @@ public enum PostProcessor {
     public static let hallucinationPhrases: Set<String> = [
         "thank you for watching",
         "thanks for watching",
-        "thank you for watching!",
         "please subscribe",
         "don't forget to like and subscribe",
+        "like and subscribe",
         "subtitles by the amara.org community",
-        "thanks for watching. bye.",
-        "bye bye.",
-        "www.",
+        "thanks for watching bye",
+        "bye bye",
+        "goodbye",
+        "www",
         "translated by",
-        "transcribed by"
+        "transcribed by",
+        "thank you",
+        "thanks",
+        "you",
+        "the end",
+        "..."
     ]
 
     public static func stripSpecialTokens(_ text: String) -> String {
@@ -26,10 +32,15 @@ public enum PostProcessor {
         return regex.stringByReplacingMatches(in: text, range: range, withTemplate: "")
     }
 
+    private static let trailingPunctuation = CharacterSet(charactersIn: ".!?, ")
+
+    /// Lowercases, strips special tokens, and trims surrounding punctuation/whitespace
+    /// so "Thank you." and "thank you" both match the same hallucination-list entry.
     private static func normalized(_ text: String) -> String {
         stripSpecialTokens(text)
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .lowercased()
+            .trimmingCharacters(in: trailingPunctuation)
     }
 
     /// Removes segments that are near-exact repeats of the immediately preceding

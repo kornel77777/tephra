@@ -34,7 +34,10 @@ final class RecordingViewModel: ObservableObject {
         queue: TranscriptionQueueStore,
         settings: SettingsStore
     ) {
-        guard let subjectCode = selectedSubjectCode else { return }
+        // Recording in progress always wins: even if the subject selection was
+        // somehow lost, finish() must still run so the audio is never stranded
+        // (recorder.finish() is a no-op if nothing is recording).
+        let subjectCode = selectedSubjectCode ?? "Unknown"
         Task {
             do {
                 let (url, duration, bookmarks) = try await recorder.finish()

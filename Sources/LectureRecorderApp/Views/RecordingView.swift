@@ -6,7 +6,7 @@ struct RecordingView: View {
     @EnvironmentObject private var settings: SettingsStore
     @EnvironmentObject private var library: LibraryStore
     @EnvironmentObject private var queue: TranscriptionQueueStore
-    @StateObject private var viewModel = RecordingViewModel()
+    @EnvironmentObject private var viewModel: RecordingViewModel
 
     @State private var devices: [InputDevice] = []
     @State private var isDropTargeted = false

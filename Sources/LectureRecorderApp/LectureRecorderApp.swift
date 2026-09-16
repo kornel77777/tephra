@@ -8,6 +8,7 @@ struct LectureRecorderApp: App {
     @StateObject private var queueStore = TranscriptionQueueStore()
     @StateObject private var recorder = AudioRecorder()
     @StateObject private var processor: TranscriptionQueueProcessor
+    @StateObject private var recordingViewModel = RecordingViewModel()
 
     init() {
         let settings = SettingsStore()
@@ -30,6 +31,7 @@ struct LectureRecorderApp: App {
                 .environmentObject(queueStore)
                 .environmentObject(recorder)
                 .environmentObject(processor)
+                .environmentObject(recordingViewModel)
                 .onAppear { processor.start() }
                 .frame(minWidth: 720, minHeight: 520)
         }
