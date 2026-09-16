@@ -1,5 +1,32 @@
 import Foundation
 
+/// A cross-actor cancellation flag. `TranscriptionService.transcribe` polls its
+/// `shouldContinue` closure from a plain `@Sendable` (non-isolated) context, so
+/// it can't read a `@MainActor`-isolated `Bool` directly — this wraps one behind
+/// a lock instead.
+final class CancellationFlag: @unchecked Sendable {
+    private let lock = NSLock()
+    private var flag = false
+
+    var isCancelled: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return flag
+    }
+
+    func cancel() {
+        lock.lock()
+        flag = true
+        lock.unlock()
+    }
+
+    func reset() {
+        lock.lock()
+        flag = false
+        lock.unlock()
+    }
+}
+
 /// Pulls one job at a time off the persisted queue, runs it through WhisperKit,
 /// cleans the output, writes the Obsidian note, and updates the library entry.
 /// Runs as a long-lived background task owned by the app.
@@ -13,7 +40,7 @@ public final class TranscriptionQueueProcessor: ObservableObject {
     private let library: LibraryStore
     private let settings: SettingsStore
     private let service: TranscriptionService
-    private var isCancelled = false
+    private let cancellationFlag = CancellationFlag()
     private var loopTask: Task<Void, Never>?
 
     public init(queue: TranscriptionQueueStore, library: LibraryStore, settings: SettingsStore, service: TranscriptionService) {
@@ -31,7 +58,7 @@ public final class TranscriptionQueueProcessor: ObservableObject {
     }
 
     public func cancelCurrent() {
-        isCancelled = true
+        cancellationFlag.cancel()
     }
 
     private func runLoop() async {
@@ -45,7 +72,7 @@ public final class TranscriptionQueueProcessor: ObservableObject {
     }
 
     private func process(job: TranscriptionJob) async {
-        isCancelled = false
+        cancellationFlag.reset()
         isProcessing = true
         currentJobID = job.recordingID
         currentProgress = 0
@@ -71,8 +98,8 @@ public final class TranscriptionQueueProcessor: ObservableObject {
                 onProgress: { [weak self] fraction in
                     Task { @MainActor in self?.currentProgress = fraction }
                 },
-                shouldContinue: { [weak self] in
-                    !(self?.isCancelled ?? false)
+                shouldContinue: { [cancellationFlag] in
+                    !cancellationFlag.isCancelled
                 }
             )
 

@@ -63,8 +63,8 @@ public actor TranscriptionService {
         _ = try await WhisperKit.download(
             variant: variant.rawValue,
             downloadBase: base,
-            progressCallback: { progress in
-                progress(progress.fractionCompleted)
+            progressCallback: { downloadProgress in
+                progress(downloadProgress.fractionCompleted)
             }
         )
     }
@@ -108,8 +108,7 @@ public actor TranscriptionService {
 
         var promptTokens: [Int]?
         let trimmed = promptGlossary.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !trimmed.isEmpty {
-            let tokenizer = try await whisperKit.tokenizer
+        if !trimmed.isEmpty, let tokenizer = whisperKit.tokenizer {
             let encoded = tokenizer.encode(text: " " + trimmed)
             promptTokens = encoded.filter { $0 < tokenizer.specialTokens.specialTokenBegin }
         }
@@ -120,24 +119,24 @@ public actor TranscriptionService {
             temperature: 0,
             usePrefillPrompt: promptTokens != nil,
             detectLanguage: false,
-            chunkingStrategy: .vad,
-            promptTokens: promptTokens,
             wordTimestamps: false,
+            promptTokens: promptTokens,
             compressionRatioThreshold: 2.4,
             logProbThreshold: -1.0,
-            noSpeechThreshold: 0.6
+            noSpeechThreshold: 0.6,
+            chunkingStrategy: .vad
         )
 
         let audioOptions = AudioInputOptions(
-            audioLoadingMode: incrementalLoading ? .incremental : .completeFile
+            audioLoadingMode: incrementalLoading ? .incremental : .fullFile
         )
 
         let results = try await whisperKit.transcribe(
             audioPath: audioPath,
-            decodeOptions: options,
-            audioInputOptions: audioOptions
-        ) { progress in
-            onProgress(progress.fractionCompleted)
+            audioInputOptions: audioOptions,
+            decodeOptions: options
+        ) { _ in
+            onProgress(whisperKit.progress.fractionCompleted)
             return shouldContinue()
         }
 
