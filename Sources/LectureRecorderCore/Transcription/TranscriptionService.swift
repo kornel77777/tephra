@@ -140,6 +140,14 @@ public actor TranscriptionService {
             return shouldContinue()
         }
 
+        // WhisperKit's own handling of a `false` return from the callback isn't
+        // guaranteed to surface as a thrown error, so check again explicitly —
+        // callers rely on TranscriptionError.cancelled to tell a user-initiated
+        // cancel apart from a real failure.
+        guard shouldContinue() else {
+            throw TranscriptionError.cancelled
+        }
+
         let segments = results.flatMap { $0.segments }.map {
             TranscriptSegment(startSeconds: Double($0.start), endSeconds: Double($0.end), text: $0.text)
         }

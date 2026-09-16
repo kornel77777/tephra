@@ -12,117 +12,180 @@ struct RecordingView: View {
     @State private var isDropTargeted = false
     @State private var importError: String?
 
+    private var isRecording: Bool { recorder.state == .recording }
+
     var body: some View {
-        VStack(spacing: 20) {
-            subjectAndDevicePicker
+        ScrollView {
+            VStack(spacing: 22) {
+                subjectAndDevicePicker
 
-            Text(TimeFormat.clock(recorder.elapsedSeconds))
-                .font(.system(size: 48, weight: .medium, design: .monospaced))
+                VStack(spacing: 18) {
+                    Text(TimeFormat.clock(recorder.elapsedSeconds))
+                        .font(.system(size: 56, weight: .light, design: .monospaced))
+                        .foregroundStyle(Theme.textPrimary)
+                        .glow(Theme.accent, radius: 18, active: isRecording)
+                        .contentTransition(.numericText())
+                        .animation(.default, value: recorder.elapsedSeconds)
 
-            LevelMeterView(level: recorder.inputLevel)
-                .padding(.horizontal, 40)
+                    LevelMeterView(level: recorder.inputLevel)
+                        .padding(.horizontal, 50)
 
-            controls
+                    controls
+                }
+                .padding(.vertical, 30)
+                .frame(maxWidth: .infinity)
+                .panel(elevated: true)
 
-            if !recorder.bookmarks.isEmpty {
-                bookmarksList
+                if !recorder.bookmarks.isEmpty {
+                    bookmarksList
+                }
+
+                if let error = viewModel.lastError ?? importError {
+                    Text(error)
+                        .font(.system(.caption, design: .rounded))
+                        .foregroundStyle(Theme.danger)
+                }
+
+                dropZone
             }
-
-            if let error = viewModel.lastError ?? importError {
-                Text(error).foregroundStyle(.red)
-            }
-
-            Divider().padding(.vertical, 8)
-
-            dropZone
+            .padding(28)
         }
-        .padding(30)
         .onAppear { devices = viewModel.availableDevices(recorder: recorder) }
     }
 
     private var subjectAndDevicePicker: some View {
-        HStack(spacing: 16) {
-            Picker("Subject", selection: $viewModel.selectedSubjectCode) {
-                Text("Choose...").tag(String?.none)
-                ForEach(settings.settings.subjects) { subject in
-                    Text(subject.displayName).tag(String?.some(subject.code))
+        HStack(spacing: 14) {
+            fieldPicker(label: "SUBJECT") {
+                Picker("", selection: $viewModel.selectedSubjectCode) {
+                    Text("Choose…").tag(String?.none)
+                    ForEach(settings.settings.subjects) { subject in
+                        Text(subject.displayName).tag(String?.some(subject.code))
+                    }
                 }
+                .labelsHidden()
             }
             .disabled(recorder.state != .idle)
 
-            Picker("Input", selection: $viewModel.selectedInputDevice) {
-                Text("System Default").tag(InputDevice?.none)
-                ForEach(devices) { device in
-                    Text(device.name).tag(InputDevice?.some(device))
+            fieldPicker(label: "INPUT") {
+                Picker("", selection: $viewModel.selectedInputDevice) {
+                    Text("System Default").tag(InputDevice?.none)
+                    ForEach(devices) { device in
+                        Text(device.name).tag(InputDevice?.some(device))
+                    }
                 }
+                .labelsHidden()
             }
             .disabled(recorder.state != .idle)
         }
     }
 
+    private func fieldPicker(label: String, @ViewBuilder content: () -> some View) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(label)
+                .font(.system(.caption2, design: .rounded, weight: .bold))
+                .tracking(1.2)
+                .foregroundStyle(Theme.textTertiary)
+            content()
+                .tint(Theme.accent)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .panel()
+        }
+        .frame(maxWidth: .infinity)
+    }
+
     private var controls: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 14) {
             switch recorder.state {
             case .idle:
                 Button {
                     viewModel.start(recorder: recorder, settings: settings)
                 } label: {
-                    Label("Start", systemImage: "record.circle").font(.title2)
+                    Label("Start Recording", systemImage: "record.circle.fill")
                 }
+                .buttonStyle(.glow(tint: Theme.accent, filled: true))
                 .disabled(viewModel.selectedSubjectCode == nil)
 
             case .recording:
                 Button {
                     recorder.pause()
                 } label: {
-                    Label("Pause", systemImage: "pause.circle").font(.title2)
+                    Label("Pause", systemImage: "pause.fill")
                 }
+                .buttonStyle(.glow(tint: Theme.textSecondary))
+
                 Button {
                     recorder.addBookmark()
                 } label: {
-                    Label("Bookmark", systemImage: "star.circle").font(.title2)
+                    Label("Bookmark", systemImage: "star.fill")
                 }
+                .buttonStyle(.glow(tint: Theme.accentAlt))
+
                 Button(role: .destructive) {
                     viewModel.stopAndEnqueue(recorder: recorder, library: library, queue: queue, settings: settings)
                 } label: {
-                    Label("Stop", systemImage: "stop.circle").font(.title2)
+                    Label("Stop", systemImage: "stop.fill")
                 }
+                .buttonStyle(.glow(tint: Theme.danger, filled: true))
 
             case .paused:
                 Button {
                     try? recorder.resume()
                 } label: {
-                    Label("Resume", systemImage: "play.circle").font(.title2)
+                    Label("Resume", systemImage: "play.fill")
                 }
+                .buttonStyle(.glow(tint: Theme.accent, filled: true))
+
                 Button(role: .destructive) {
                     viewModel.stopAndEnqueue(recorder: recorder, library: library, queue: queue, settings: settings)
                 } label: {
-                    Label("Stop", systemImage: "stop.circle").font(.title2)
+                    Label("Stop", systemImage: "stop.fill")
                 }
+                .buttonStyle(.glow(tint: Theme.danger, filled: true))
             }
         }
     }
 
     private var bookmarksList: some View {
-        VStack(alignment: .leading) {
-            Text("Bookmarks").font(.headline)
+        VStack(alignment: .leading, spacing: 8) {
+            Text("BOOKMARKS")
+                .font(.system(.caption2, design: .rounded, weight: .bold))
+                .tracking(1.2)
+                .foregroundStyle(Theme.textTertiary)
             ForEach(recorder.bookmarks) { bookmark in
-                Text("⭐ \(bookmark.timestampLabel)")
+                HStack(spacing: 6) {
+                    Image(systemName: "star.fill").foregroundStyle(Theme.accentAlt).font(.caption)
+                    Text(bookmark.timestampLabel)
+                        .font(.system(.body, design: .monospaced))
+                        .foregroundStyle(Theme.textPrimary)
+                }
             }
         }
+        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .panel()
     }
 
     private var dropZone: some View {
-        VStack {
-            Image(systemName: "arrow.down.doc")
-                .font(.largeTitle)
-            Text("Drop a voice memo or audio file (.m4a, .mp3, .wav, .flac) here to transcribe it")
-                .foregroundStyle(.secondary)
+        VStack(spacing: 10) {
+            Image(systemName: "arrow.down.doc.fill")
+                .font(.title)
+                .foregroundStyle(isDropTargeted ? Theme.accent : Theme.textTertiary)
+            Text("Drop a voice memo or audio file (.m4a, .mp3, .wav, .flac) to transcribe it")
+                .font(.system(.callout, design: .rounded))
+                .foregroundStyle(Theme.textSecondary)
         }
-        .frame(maxWidth: .infinity, minHeight: 100)
-        .background(RoundedRectangle(cornerRadius: 12).fill(isDropTargeted ? Color.accentColor.opacity(0.15) : Color.secondary.opacity(0.06)))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.secondary.opacity(0.3), style: StrokeStyle(lineWidth: 1, dash: [6])))
+        .frame(maxWidth: .infinity, minHeight: 110)
+        .background(
+            RoundedRectangle(cornerRadius: Theme.cornerRadius, style: .continuous)
+                .fill(isDropTargeted ? Theme.accent.opacity(0.08) : Theme.surface.opacity(0.5))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: Theme.cornerRadius, style: .continuous)
+                .strokeBorder(isDropTargeted ? Theme.accent.opacity(0.7) : Theme.border, style: StrokeStyle(lineWidth: 1.2, dash: [6, 5]))
+        )
+        .glow(Theme.accent, radius: 12, active: isDropTargeted)
+        .animation(.easeOut(duration: 0.15), value: isDropTargeted)
         .onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
             handleDrop(providers: providers)
             return true

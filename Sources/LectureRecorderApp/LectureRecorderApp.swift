@@ -33,8 +33,10 @@ struct LectureRecorderApp: App {
                 .environmentObject(processor)
                 .environmentObject(recordingViewModel)
                 .onAppear { processor.start() }
-                .frame(minWidth: 720, minHeight: 520)
+                .frame(minWidth: 760, minHeight: 540)
+                .preferredColorScheme(.dark)
         }
         .windowResizability(.contentSize)
+        .defaultSize(width: 900, height: 620)
     }
 }

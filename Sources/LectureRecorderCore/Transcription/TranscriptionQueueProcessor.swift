@@ -126,6 +126,9 @@ public final class TranscriptionQueueProcessor: ObservableObject {
 
             library.upsert(recording)
             queue.remove(job)
+        } catch TranscriptionError.cancelled {
+            library.updateStatus(id: job.recordingID, status: .failed, failureReason: "Cancelled")
+            queue.remove(job)
         } catch {
             AppLogger.error("Transcription failed for job \(job.id): \(error.localizedDescription)")
             library.updateStatus(id: job.recordingID, status: .failed, failureReason: error.localizedDescription)
