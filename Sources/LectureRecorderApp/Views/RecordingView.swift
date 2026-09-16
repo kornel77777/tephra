@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 import LectureRecorderCore
 
 struct RecordingView: View {
@@ -10,6 +11,7 @@ struct RecordingView: View {
 
     @State private var devices: [InputDevice] = []
     @State private var isDropTargeted = false
+    @State private var isChoosingFile = false
     @State private var importError: String?
 
     private var isRecording: Bool { recorder.state == .recording }
@@ -167,13 +169,16 @@ struct RecordingView: View {
     }
 
     private var dropZone: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 12) {
             Image(systemName: "arrow.down.doc.fill")
                 .font(.title)
                 .foregroundStyle(isDropTargeted ? Theme.accent : Theme.textTertiary)
             Text("Drop a voice memo or audio file (.m4a, .mp3, .wav, .flac) to transcribe it")
                 .font(.system(.callout, design: .rounded))
                 .foregroundStyle(Theme.textSecondary)
+            Button("Choose File…") { isChoosingFile = true }
+                .buttonStyle(.glow(tint: Theme.accent))
+                .disabled(viewModel.selectedSubjectCode == nil)
         }
         .frame(maxWidth: .infinity, minHeight: 110)
         .background(
@@ -190,39 +195,62 @@ struct RecordingView: View {
             handleDrop(providers: providers)
             return true
         }
-        .disabled(viewModel.selectedSubjectCode == nil)
+        .fileImporter(
+            isPresented: $isChoosingFile,
+            allowedContentTypes: [.audio],
+            allowsMultipleSelection: true
+        ) { result in
+            switch result {
+            case .success(let urls):
+                for url in urls { importAudio(from: url) }
+            case .failure(let error):
+                importError = error.localizedDescription
+            }
+        }
     }
 
     private func handleDrop(providers: [NSItemProvider]) {
-        guard let subjectCode = viewModel.selectedSubjectCode else {
+        guard viewModel.selectedSubjectCode != nil else {
             importError = "Choose a subject before importing audio."
             return
         }
         for provider in providers {
             _ = provider.loadObject(ofClass: URL.self) { url, _ in
-                guard let url, AudioImporter.isSupported(url) else { return }
-                Task { @MainActor in
-                    do {
-                        let imported = try await AudioImporter.importFile(at: url)
-                        let recording = LectureRecording(
-                            subjectCode: subjectCode,
-                            recordedAt: Date(),
-                            durationSeconds: imported.duration,
-                            audioFileName: imported.url.lastPathComponent,
-                            status: .queued,
-                            isImported: true
-                        )
-                        library.upsert(recording)
-                        queue.enqueue(TranscriptionJob(
-                            recordingID: recording.id,
-                            audioPath: imported.url.path,
-                            subjectCode: subjectCode,
-                            modelVariant: settings.settings.selectedModel.rawValue
-                        ))
-                    } catch {
-                        importError = error.localizedDescription
-                    }
-                }
+                guard let url else { return }
+                Task { @MainActor in importAudio(from: url) }
+            }
+        }
+    }
+
+    private func importAudio(from url: URL) {
+        guard let subjectCode = viewModel.selectedSubjectCode else {
+            importError = "Choose a subject before importing audio."
+            return
+        }
+        guard AudioImporter.isSupported(url) else {
+            importError = "\(url.lastPathComponent) isn't a supported audio format."
+            return
+        }
+        Task { @MainActor in
+            do {
+                let imported = try await AudioImporter.importFile(at: url)
+                let recording = LectureRecording(
+                    subjectCode: subjectCode,
+                    recordedAt: Date(),
+                    durationSeconds: imported.duration,
+                    audioFileName: imported.url.lastPathComponent,
+                    status: .queued,
+                    isImported: true
+                )
+                library.upsert(recording)
+                queue.enqueue(TranscriptionJob(
+                    recordingID: recording.id,
+                    audioPath: imported.url.path,
+                    subjectCode: subjectCode,
+                    modelVariant: settings.settings.selectedModel.rawValue
+                ))
+            } catch {
+                importError = error.localizedDescription
             }
         }
     }
