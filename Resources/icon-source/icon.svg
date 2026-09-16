@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#15181e"/>
+    <stop offset="0.55" stop-color="#0a0c10"/>
+    <stop offset="1" stop-color="#030405"/>
+  </linearGradient>
+  <radialGradient id="glow" cx="0.5" cy="0.500" r="0.62">
+    <stop offset="0" stop-color="#2be0c8" stop-opacity="0.30"/>
+    <stop offset="0.5" stop-color="#2be0c8" stop-opacity="0.08"/>
+    <stop offset="1" stop-color="#2be0c8" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0" stop-color="#000000" stop-opacity="0.55"/>
+    <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+  </radialGradient>
+  <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="16"/>
+  </filter>
+</defs>
+
+<rect width="1024" height="1024" rx="224" ry="224" fill="url(#bg)"/>
+<rect width="1024" height="1024" rx="224" ry="224" fill="url(#glow)"/>
+<ellipse cx="512" cy="886.7" rx="200" ry="50" fill="url(#shadow)" filter="url(#soft)"/>
+<polygon points="483.2,675.2 404.4,172.2 678.7,414.2" fill="#788492" stroke="#05070a" stroke-width="3"/>
+<polygon points="491.1,680.6 686.9,424.3 747.4,673.0" fill="#0e1013" stroke="#05070a" stroke-width="3"/>
+<polygon points="491.7,690.3 746.2,684.2 616.3,850.7" fill="#0e1013" stroke="#05070a" stroke-width="3"/>
+<polygon points="484.0,696.8 606.6,856.1 432.7,840.4" fill="#1a1d22" stroke="#05070a" stroke-width="3"/>
+<polygon points="470.9,689.1 420.6,835.2 276.1,611.2" fill="#2e343c" stroke="#05070a" stroke-width="3"/>
+<polygon points="476.7,676.2 275.4,596.0 399.0,173.3" fill="#4e5864" stroke="#05070a" stroke-width="3"/>
+<polygon points="399.6,162.3 689.7,413.7 756.2,679.7 616.1,861.7 423.2,845.9 267.8,603.9" fill="none" stroke="#4be6d3" stroke-opacity="0.55" stroke-width="3"/>
+</svg>

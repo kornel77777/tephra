@@ -1,4 +1,4 @@
-# Lecture Recorder
+# Tephra
 
 A macOS app for recording lectures and transcribing them fully offline with
 [WhisperKit](https://github.com/argmaxinc/argmax-oss-swift) (Core ML, runs on
@@ -62,7 +62,7 @@ Without Xcode (Command Line Tools only), build and package it manually:
 
 ```bash
 Scripts/build_app.sh release
-open .build/LectureRecorderApp.app
+open .build/Tephra.app
 ```
 
 The script builds the executable, assembles a minimal `.app` bundle with the

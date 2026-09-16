@@ -6,20 +6,22 @@ set -euo pipefail
 
 CONFIG="${1:-release}"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-APP_NAME="LectureRecorderApp"
+EXECUTABLE_NAME="LectureRecorderApp"
+APP_DISPLAY_NAME="Tephra"
 BUILD_DIR="$ROOT_DIR/.build/$CONFIG"
-APP_BUNDLE="$ROOT_DIR/.build/$APP_NAME.app"
+APP_BUNDLE="$ROOT_DIR/.build/$APP_DISPLAY_NAME.app"
 
-echo "Building $APP_NAME ($CONFIG)..."
-swift build --package-path "$ROOT_DIR" -c "$CONFIG" --product "$APP_NAME"
+echo "Building $EXECUTABLE_NAME ($CONFIG)..."
+swift build --package-path "$ROOT_DIR" -c "$CONFIG" --product "$EXECUTABLE_NAME"
 
 echo "Assembling app bundle at $APP_BUNDLE..."
 rm -rf "$APP_BUNDLE"
 mkdir -p "$APP_BUNDLE/Contents/MacOS"
 mkdir -p "$APP_BUNDLE/Contents/Resources"
 
-cp "$BUILD_DIR/$APP_NAME" "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
+cp "$BUILD_DIR/$EXECUTABLE_NAME" "$APP_BUNDLE/Contents/MacOS/$EXECUTABLE_NAME"
 cp "$ROOT_DIR/Resources/Info.plist" "$APP_BUNDLE/Contents/Info.plist"
+cp "$ROOT_DIR/Resources/AppIcon.icns" "$APP_BUNDLE/Contents/Resources/AppIcon.icns"
 
 echo "Ad-hoc signing..."
 codesign --force --deep --sign - \

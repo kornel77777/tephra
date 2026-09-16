@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>Lecture Recorder</string>
+    <string>Tephra</string>
     <key>CFBundleDisplayName</key>
-    <string>Lecture Recorder</string>
+    <string>Tephra</string>
     <key>CFBundleIdentifier</key>
-    <string>com.lecturerecorder.app</string>
+    <string>com.tephra.app</string>
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>CFBundleShortVersionString</key>
@@ -16,12 +16,14 @@
     <string>APPL</string>
     <key>CFBundleExecutable</key>
     <string>LectureRecorderApp</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>LSMinimumSystemVersion</key>
     <string>14.0</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>NSMicrophoneUsageDescription</key>
-    <string>Lecture Recorder needs microphone access to record your lectures.</string>
+    <string>Tephra needs microphone access to record your lectures.</string>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.education</string>
 </dict>
