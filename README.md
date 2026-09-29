@@ -81,8 +81,11 @@ Takes a minute to get going, then it's basically record-and-forget:
 2. Add at least one subject (course code + display name + optional glossary
    of proper nouns/jargon — this is what most improves transcription accuracy
    for lecture-specific terms).
-3. Point "Obsidian Vault" at your vault folder. Notes go to
-   `Lectures/transcripts/`, audio to `Lectures/audio/`.
+3. Point "Notes Folder" at wherever you want the output — it's really just a
+   folder, no Obsidian required. Notes go to `Lectures/transcripts/`, audio
+   to `Lectures/audio/`. Point it at an Obsidian vault and the notes embed
+   the audio (`![[...]]`) automatically; any other folder still gets the
+   same markdown + audio files, just without the embed rendering.
 4. Record, or drag a `.m4a`/`.mp3`/`.wav`/`.flac` file onto the Record tab to
    import and transcribe it instead.
 
@@ -121,7 +124,7 @@ Takes a minute to get going, then it's basically record-and-forget:
 - Phase 1 (CLI transcription): works, and the subject-glossary prompt earns
   its keep — an A/B test with an invented professor name and some German
   jargon came back mangled without it, clean with it.
-- Phase 2 (recording, queue, Obsidian export): tested end-to-end with a real
+- Phase 2 (recording, queue, notes export): tested end-to-end with a real
   mic — record, bookmark, stop, queue, transcribe, done. Force-killing the
   app mid-recording left a valid, recoverable `.caf` behind, as intended.
 - Phase 3 (bookmarks, library, settings, packaging): all in and working,

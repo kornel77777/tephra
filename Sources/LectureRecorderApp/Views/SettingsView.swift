@@ -17,14 +17,19 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 18) {
-                SectionCard(title: "Obsidian Vault") {
-                    HStack {
-                        Text(settings.settings.vaultPath ?? "Not set")
-                            .font(.system(.body, design: .rounded))
-                            .foregroundStyle(settings.settings.vaultPath == nil ? Theme.textTertiary : Theme.textPrimary)
-                        Spacer()
-                        Button("Choose…") { isChoosingVault = true }
-                            .buttonStyle(.glow(tint: Theme.accent))
+                SectionCard(title: "Notes Folder") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text(settings.settings.vaultPath ?? "Not set")
+                                .font(.system(.body, design: .rounded))
+                                .foregroundStyle(settings.settings.vaultPath == nil ? Theme.textTertiary : Theme.textPrimary)
+                            Spacer()
+                            Button("Choose…") { isChoosingVault = true }
+                                .buttonStyle(.glow(tint: Theme.accent))
+                        }
+                        Text("Just a folder — transcripts and audio land here as plain markdown + audio files. Point it at an Obsidian vault and the audio embeds automatically; any other folder works too, you'll just get the raw files.")
+                            .font(.system(.caption, design: .rounded))
+                            .foregroundStyle(Theme.textTertiary)
                     }
                 }
 
