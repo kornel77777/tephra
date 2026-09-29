@@ -85,12 +85,13 @@ Takes a minute to get going:
 2. Add at least one subject (course code + display name + optional glossary
    of proper nouns/jargon — this is what most improves transcription accuracy
    for lecture-specific terms).
-3. Point "Notes Folder" at wherever you want the output — it's really just a
-   folder, no Obsidian required. Notes go to `Lectures/transcripts/`, audio
-   to `Lectures/audio/`. Point it at an Obsidian vault and the notes embed
-   the audio (`![[...]]`) automatically; any other folder still gets the
-   same markdown + audio files, just without the embed rendering.
-4. Record, or drag a `.m4a`/`.mp3`/`.wav`/`.flac` file onto the Record tab to
+3. Point "Notes Folder" at wherever you want the output. It's just a
+   folder, no Obsidian required if you don't want.
+   Notes go to `Lectures/transcripts/`, audio to `Lectures/audio/`.
+   Point it at an Obsidian vault and the notes embed the audio (`![[...]]`)
+   automatically; any other folder still gets the same
+   markdown + audio files, just without the embed rendering.
+5. Record, or drag a `.m4a`/`.mp3`/`.wav`/`.flac` file onto the Record tab to
    import and transcribe it instead.
 
 ## Design notes / known limitations
@@ -126,7 +127,7 @@ Takes a minute to get going:
 ## Status
 
 - Phase 1 (CLI transcription): works, and the subject-glossary prompt earns
-  its keep — an A/B test with an invented professor name and some German
+  its keep, an A/B test with an invented professor name and some German
   jargon came back mangled without it, clean with it.
 - Phase 2 (recording, queue, notes export): tested end-to-end with a real
   mic — record, bookmark, stop, queue, transcribe, done. Force-killing the
@@ -141,8 +142,8 @@ still aren't filled in — measure on your machine and drop the numbers here.
 
 ## Out of scope (for now)
 
-Real-time captioning, speaker diarization, local LLM summarization, and an
-iOS companion are not part of this app.
+Real-time captioning, speaker diarization, local LLM summarization, 
+language specialization, and an iOS companion are not part of this app.
 
 ## License
 
