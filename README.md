@@ -6,9 +6,9 @@
 
 A macOS app for recording lectures and transcribing them fully offline with
 [WhisperKit](https://github.com/argmaxinc/argmax-oss-swift) (Core ML, runs on
-the Neural Engine / GPU). No cloud APIs, no accounts, no per-use cost — the
-only time this thing touches the network is to grab a model from Hugging
-Face once, and then it's yours.
+the Neural Engine / GPU). No cloud APIs, no accounts, no per-use cost. The
+only time the application requires the network is when grabbing a model from Hugging
+Face once, and then done!!
 
 ## Requirements
 
@@ -78,7 +78,7 @@ app is silently denied access.
 
 ## First run
 
-Takes a minute to get going, then it's basically record-and-forget:
+Takes a minute to get going:
 
 1. Launch the app, go to Settings, pick a transcription model, and press
    Download. This is the only step that needs internet access.
@@ -117,8 +117,8 @@ Takes a minute to get going, then it's basically record-and-forget:
   which this app doesn't rely on anyway.
 - **Input device switching**: macOS has no `AVAudioSession`, so selecting a
   non-default microphone goes through Core Audio's
-  `kAudioOutputUnitProperty_CurrentDevice` directly — this is the part most
-  worth re-testing against real external/Continuity microphones.
+  `kAudioOutputUnitProperty_CurrentDevice` directly. Shall re-test against
+  real external/Continuity microphones.
 - **Post-processing** is intentionally simple rule-based cleanup (duplicate
   consecutive segments, a fixed list of known silence hallucinations, stray
   `<|...|>` tokens) rather than anything model-based.
@@ -142,7 +142,7 @@ still aren't filled in — measure on your machine and drop the numbers here.
 ## Out of scope (for now)
 
 Real-time captioning, speaker diarization, local LLM summarization, and an
-iOS companion are intentionally not part of this app.
+iOS companion are not part of this app.
 
 ## License
 
