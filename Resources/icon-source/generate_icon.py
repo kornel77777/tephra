@@ -127,7 +127,9 @@ svg.append(f'<polygon points="{outline_pts}" fill="none" stroke="#4be6d3" stroke
 
 svg.append('</svg>')
 
-with open('/private/tmp/claude-501/-Users-hitoshiomori-Tech-Applications/12d5376f-d0c8-42df-9016-d63304ca5d2a/scratchpad/icon/stone4.svg', 'w') as f:
+import os
+output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'icon.svg')
+with open(output_path, 'w') as f:
     f.write("\n".join(svg))
 
 print("shape bbox center was", shape_cx, shape_cy, "-> shifted by", dx, dy)
