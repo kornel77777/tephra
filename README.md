@@ -1,6 +1,8 @@
 # Tephra
 
-<img src="Resources/icon-source/icon-preview.png" alt="Tephra icon" width="128" height="128">
+<p align="center">
+  <img src="Resources/icon-source/logo.png" alt="Tephra logo" width="220">
+</p>
 
 A macOS app for recording lectures and transcribing them fully offline with
 [WhisperKit](https://github.com/argmaxinc/argmax-oss-swift) (Core ML, runs on
