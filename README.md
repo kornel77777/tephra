@@ -2,8 +2,9 @@
 
 A macOS app for recording lectures and transcribing them fully offline with
 [WhisperKit](https://github.com/argmaxinc/argmax-oss-swift) (Core ML, runs on
-the Neural Engine / GPU). No cloud APIs, no accounts, no per-use cost. The only
-network access is the one-time model download from Hugging Face.
+the Neural Engine / GPU). No cloud APIs, no accounts, no per-use cost — the
+only time this thing touches the network is to grab a model from Hugging
+Face once, and then it's yours.
 
 ## Requirements
 
@@ -73,6 +74,8 @@ app is silently denied access.
 
 ## First run
 
+Takes a minute to get going, then it's basically record-and-forget:
+
 1. Launch the app, go to Settings, pick a transcription model, and press
    Download. This is the only step that needs internet access.
 2. Add at least one subject (course code + display name + optional glossary
@@ -115,18 +118,25 @@ app is silently denied access.
 
 ## Status
 
-- Phase 1 (CLI transcription proof of concept): implemented.
-- Phase 2 (recording, queue, Obsidian export): implemented, not yet run
-  end-to-end against real hardware/microphones.
-- Phase 3 (bookmarks, library, settings, packaging): implemented at the code
-  level (bookmarks, library list with retry, subject/model/vault settings,
-  `.app` packaging script); needs a real-machine pass to confirm mic
-  permissions, device switching, and long-recording behavior end-to-end.
+- Phase 1 (CLI transcription): works, and the subject-glossary prompt earns
+  its keep — an A/B test with an invented professor name and some German
+  jargon came back mangled without it, clean with it.
+- Phase 2 (recording, queue, Obsidian export): tested end-to-end with a real
+  mic — record, bookmark, stop, queue, transcribe, done. Force-killing the
+  app mid-recording left a valid, recoverable `.caf` behind, as intended.
+- Phase 3 (bookmarks, library, settings, packaging): all in and working,
+  including a cancel button that exists specifically because someone (hi)
+  double-imported the same hour-long file and had no way to back out of it.
 
-Benchmarks (90-minute lecture, full `large-v3`, wall-clock vs. real time) are
-not filled in yet — measure on your machine and update this section.
+Device switching (external/Continuity mics) hasn't had a real test yet, and
+benchmarks (90-minute lecture, full `large-v3`, wall-clock vs. real time)
+still aren't filled in — measure on your machine and drop the numbers here.
 
 ## Out of scope (for now)
 
 Real-time captioning, speaker diarization, local LLM summarization, and an
 iOS companion are intentionally not part of this app.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
