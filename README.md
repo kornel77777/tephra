@@ -1,7 +1,7 @@
 # Tephra
 
 <p align="center">
-  <img src="Resources/icon-source/logo.png" alt="Tephra logo" width="220">
+  <img src="Resources/icon-source/logo.png" alt="Tephra logo" width="180">
 </p>
 
 A macOS app for recording lectures and transcribing them fully offline with
