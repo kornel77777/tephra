@@ -76,11 +76,21 @@ signing plus the `NSMicrophoneUsageDescription` key in Info.plist is what
 makes macOS show the microphone permission prompt at all — without both, the
 app is silently denied access.
 
+## How it works
+
+Tephra lives in your notch. There's no Dock icon and no window — push your
+cursor to the top-center of the screen and it drops down; move away and it
+tucks back in. While you're recording, a small red dot + timer sits next to
+the notch so you can tell it's running. Drag an audio file up there and it
+opens by itself so you can drop it in. Open the app again from Finder or
+Spotlight if you lose it, and it'll peek out for a few seconds. Quit lives
+at the bottom of the Settings tab.
+
 ## First run
 
 Takes a minute to get going:
 
-1. Launch the app, go to Settings, pick a transcription model, and press
+1. Launch the app, open the Settings tab, pick a transcription model, and press
    Download. This is the only step that needs internet access.
 2. Add at least one subject (course code + display name + optional glossary
    of proper nouns/jargon — this is what most improves transcription accuracy
