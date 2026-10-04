@@ -66,6 +66,7 @@ extension View {
 /// Pill-shaped control button with an accent-tinted border, used for every
 /// primary action (Start/Stop/Pause/Bookmark) in place of the system default.
 struct GlowButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
     var tint: Color = Theme.accent
     var filled: Bool = false
 
@@ -82,7 +83,7 @@ struct GlowButtonStyle: ButtonStyle {
                 Capsule().strokeBorder(tint.opacity(filled ? 0 : 0.6), lineWidth: 1.2)
             )
             .foregroundStyle(filled ? Color.black.opacity(0.85) : tint)
-            .opacity(configuration.isPressed ? 0.85 : 1)
+            .opacity(isEnabled ? (configuration.isPressed ? 0.85 : 1) : 0.35)
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
     }

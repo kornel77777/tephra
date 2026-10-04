@@ -10,6 +10,7 @@ private let sampleRateOptions: [(label: String, value: Double)] = [
 
 struct SettingsView: View {
     @EnvironmentObject private var settings: SettingsStore
+    @EnvironmentObject private var recorder: AudioRecorder
     @StateObject private var viewModel = SettingsViewModel()
     @State private var editingSubject: Subject?
     @State private var isChoosingVault = false
@@ -145,8 +146,27 @@ struct SettingsView: View {
                         .buttonStyle(.glow(tint: Theme.accent, filled: true))
                     }
                 }
+
+                SectionCard(title: "App") {
+                    HStack {
+                        Text(recorder.state == .idle ? "Tephra lives in your notch — hover the top-center of the screen to open it." : "Stop the recording before quitting.")
+                            .font(.system(.caption, design: .rounded))
+                            .foregroundStyle(Theme.textTertiary)
+                        Spacer()
+                        Button("Quit Tephra") { NSApp.terminate(nil) }
+                            .buttonStyle(.glow(tint: Theme.danger))
+                            .disabled(recorder.state != .idle)
+                    }
+                }
             }
-            .padding(24)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 4)
+        }
+        .onChange(of: isChoosingVault) { _, showing in
+            if showing { NSApp.activate() }
+        }
+        .onChange(of: editingSubject) { _, subject in
+            if subject != nil { NSApp.activate() }
         }
         .fileImporter(isPresented: $isChoosingVault, allowedContentTypes: [.folder]) { result in
             if case .success(let url) = result {

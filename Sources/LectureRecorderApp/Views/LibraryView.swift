@@ -18,7 +18,8 @@ struct LibraryView: View {
                     }
                 }
             }
-            .padding(24)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 4)
         }
     }
 
