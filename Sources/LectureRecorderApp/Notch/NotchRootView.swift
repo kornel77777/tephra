@@ -25,6 +25,8 @@ struct NotchRootView: View {
                 .opacity(vm.isExpanded ? 1 : 0)
 
             content(metrics: metrics)
+                .frame(width: NotchLayout.logicalSize.width, height: NotchLayout.logicalSize.height)
+                .scaleEffect(NotchLayout.scale, anchor: .top)
                 .frame(width: shapeWidth, height: shapeHeight, alignment: .top)
                 .clipShape(NotchShape(bottomRadius: vm.isExpanded ? 30 : 8))
                 .opacity(vm.isExpanded ? 1 : 0)
@@ -50,8 +52,15 @@ struct NotchRootView: View {
 
     // MARK: - Expanded content
 
-    private func content(metrics: NotchMetrics) -> some View {
-        VStack(spacing: 0) {
+    /// Laid out at logical size and scaled down afterwards, so the hardware notch's
+    /// real dimensions have to be converted into the same logical units.
+    private func content(metrics realMetrics: NotchMetrics) -> some View {
+        let metrics = NotchMetrics(
+            hasNotch: realMetrics.hasNotch,
+            notchWidth: realMetrics.notchWidth / NotchLayout.scale,
+            notchHeight: realMetrics.notchHeight / NotchLayout.scale
+        )
+        return VStack(spacing: 0) {
             topBar(metrics: metrics)
                 .frame(height: max(metrics.notchHeight, 36))
 
@@ -64,7 +73,7 @@ struct NotchRootView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .padding(.horizontal, NotchLayout.ear + 10)
+        .padding(.horizontal, (NotchLayout.ear + 10) / NotchLayout.scale)
         .padding(.bottom, 14)
     }
 
