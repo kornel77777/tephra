@@ -28,4 +28,27 @@ public final class LibraryStore: ObservableObject {
         recordings[index].status = status
         recordings[index].failureReason = failureReason
     }
+
+    /// Only finished entries can be removed — anything queued or mid-transcription is still in use.
+    public func isRemovable(_ recording: LectureRecording) -> Bool {
+        recording.status == .completed || recording.status == .failed
+    }
+
+    public func removableRecordings(olderThan cutoff: Date) -> [LectureRecording] {
+        recordings.filter { $0.recordedAt < cutoff && isRemovable($0) }
+    }
+
+    /// Drops entries from the library and deletes Tephra's own audio copy of each.
+    /// Notes and audio already exported to the Notes Folder are never touched.
+    @discardableResult
+    public func remove(_ targets: [LectureRecording]) -> Int {
+        let doomed = targets.filter(isRemovable)
+        let ids = Set(doomed.map(\.id))
+        for recording in doomed {
+            let name = (recording.audioFileName as NSString).lastPathComponent
+            try? FileManager.default.removeItem(at: AppPaths.recordingsDirectory.appendingPathComponent(name))
+        }
+        recordings.removeAll { ids.contains($0.id) }
+        return doomed.count
+    }
 }
