@@ -23,7 +23,7 @@ struct NotchRecordView: View {
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
             recorderPanel
-            sidePanel.frame(width: 250)
+            sidePanel.frame(width: 290)
         }
         .padding(.top, 4)
         .onAppear { devices = viewModel.availableDevices(recorder: recorder) }
@@ -206,7 +206,7 @@ struct NotchRecordView: View {
                 .disabled(viewModel.selectedSubjectCode == nil)
         }
         .padding(.horizontal, 12)
-        .frame(height: 52)
+        .frame(height: 46)
         .background(
             RoundedRectangle(cornerRadius: Theme.cornerRadius, style: .continuous)
                 .fill(isDropTargeted ? Theme.accent.opacity(0.1) : Theme.surface.opacity(0.5))

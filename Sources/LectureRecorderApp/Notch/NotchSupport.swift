@@ -33,8 +33,8 @@ struct NotchMetrics: Equatable {
 
 enum NotchLayout {
     /// UI is laid out at `logicalSize` and drawn at `scale`, so tweaking one number resizes the whole notch.
-    static let scale: CGFloat = 0.8
-    static let logicalSize = CGSize(width: 680, height: 340)
+    static let scale: CGFloat = 0.85
+    static let logicalSize = CGSize(width: 706, height: 270)
     /// Size actually shown on screen.
     static var expandedSize: CGSize {
         CGSize(width: logicalSize.width * scale, height: logicalSize.height * scale)
