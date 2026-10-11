@@ -12,6 +12,7 @@ final class AppEnvironment {
     let processor: TranscriptionQueueProcessor
 
     init() {
+        ThemeStore.shared.bind(to: settings)
         processor = TranscriptionQueueProcessor(
             queue: queue,
             library: library,

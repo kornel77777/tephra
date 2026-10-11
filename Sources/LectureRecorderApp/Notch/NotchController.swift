@@ -53,6 +53,7 @@ final class NotchController {
             .environmentObject(env.processor)
             .environmentObject(env.recordingViewModel)
             .environmentObject(vm)
+            .environmentObject(ThemeStore.shared)
             .preferredColorScheme(.dark)
 
         let hosting = NSHostingView(rootView: root)

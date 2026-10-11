@@ -5,6 +5,7 @@ struct NotchRootView: View {
     @ObservedObject var vm: NotchViewModel
     @EnvironmentObject private var recorder: AudioRecorder
     @EnvironmentObject private var processor: TranscriptionQueueProcessor
+    @EnvironmentObject private var themeStore: ThemeStore
 
     @State private var pulse = false
 
@@ -35,6 +36,8 @@ struct NotchRootView: View {
                     .transition(.opacity)
             }
         }
+        // Colors are read from `Theme` at draw time, so a new id rebuilds everything with the new palette.
+        .id(themeStore.revision)
         .frame(
             width: NotchLayout.windowSize.width,
             height: NotchLayout.windowSize.height,

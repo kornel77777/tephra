@@ -18,6 +18,10 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 18) {
+                SectionCard(title: "Appearance") {
+                    AppearancePicker()
+                }
+
                 SectionCard(title: "Notes Folder") {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
@@ -198,5 +202,84 @@ private struct SectionCard<Content: View>: View {
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
         .panel()
+    }
+}
+
+private struct AppearancePicker: View {
+    @EnvironmentObject private var settings: SettingsStore
+
+    private static let accentChoices: [Color] = [
+        Color(red: 0.16, green: 0.92, blue: 0.85), Color(red: 0.45, green: 0.95, blue: 0.55),
+        Color(red: 0.75, green: 0.95, blue: 0.35), Color(red: 0.95, green: 0.8, blue: 0.4),
+        Color(red: 1.0, green: 0.55, blue: 0.25), Color(red: 1.0, green: 0.36, blue: 0.42),
+        Color(red: 1.0, green: 0.55, blue: 0.75), Color(red: 0.85, green: 0.45, blue: 1.0),
+        Color(red: 0.58, green: 0.48, blue: 1.0), Color(red: 0.35, green: 0.65, blue: 1.0),
+        Color(red: 0.3, green: 0.9, blue: 0.9), Color(red: 0.92, green: 0.93, blue: 0.95),
+        Color(red: 0.6, green: 0.62, blue: 0.66)
+    ]
+
+    private var currentID: String { settings.settings.themeID ?? ThemePalette.fallback.id }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            FlowLayout(spacing: 8) {
+                ForEach(ThemePalette.presets) { preset in
+                    swatch(id: preset.id, name: preset.name, accent: preset.accent, accentAlt: preset.accentAlt, fill: preset.surfaceElevated) {
+                        settings.settings.themeID = preset.id
+                    }
+                }
+                swatch(id: ThemePalette.customID, name: "Custom", accent: Theme.accent, accentAlt: Theme.accentAlt, fill: Theme.surfaceElevated) {
+                    var s = settings.settings
+                    s.customAccentHex = s.customAccentHex ?? Theme.accent.hexString
+                    s.customAccentAltHex = s.customAccentAltHex ?? Theme.accentAlt.hexString
+                    s.themeID = ThemePalette.customID
+                    settings.settings = s
+                }
+            }
+
+            if currentID == ThemePalette.customID {
+                colorRow(title: "Accent", hex: settings.settings.customAccentHex) { settings.settings.customAccentHex = $0 }
+                colorRow(title: "Secondary", hex: settings.settings.customAccentAltHex) { settings.settings.customAccentAltHex = $0 }
+            }
+        }
+    }
+
+    private func swatch(id: String, name: String, accent: Color, accentAlt: Color, fill: Color, action: @escaping () -> Void) -> some View {
+        let selected = currentID == id
+        return Button(action: action) {
+            HStack(spacing: 6) {
+                Circle().fill(accent).frame(width: 10, height: 10)
+                Circle().fill(accentAlt).frame(width: 10, height: 10)
+                Text(name)
+                    .font(.system(.footnote, design: .rounded, weight: .semibold))
+                    .foregroundStyle(Theme.textPrimary)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .background(Capsule().fill(fill))
+            .overlay(Capsule().strokeBorder(selected ? accent : Theme.border, lineWidth: selected ? 1.6 : 1))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func colorRow(title: String, hex: String?, set: @escaping (String) -> Void) -> some View {
+        HStack(spacing: 10) {
+            Text(title)
+                .font(.system(.caption, design: .rounded, weight: .medium))
+                .foregroundStyle(Theme.textSecondary)
+                .frame(width: 70, alignment: .leading)
+            FlowLayout(spacing: 7) {
+                ForEach(Array(Self.accentChoices.enumerated()), id: \.offset) { _, color in
+                    let selected = color.hexString == (hex ?? "").uppercased()
+                    Button { set(color.hexString) } label: {
+                        Circle()
+                            .fill(color)
+                            .frame(width: 20, height: 20)
+                            .overlay(Circle().strokeBorder(.white.opacity(selected ? 0.95 : 0), lineWidth: 2))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
     }
 }

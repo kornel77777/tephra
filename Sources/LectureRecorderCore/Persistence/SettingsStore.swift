@@ -7,19 +7,29 @@ public struct AppSettings: Codable, Sendable {
     public var subjects: [Subject]
     public var sampleRateHz: Double
     public var recordingChannels: Int
+    // Optional so settings files written before themes existed still decode.
+    public var themeID: String?
+    public var customAccentHex: String?
+    public var customAccentAltHex: String?
 
     public init(
         vaultPath: String? = nil,
         selectedModel: ModelVariant = .largeV3Full,
         subjects: [Subject] = [],
         sampleRateHz: Double = 48_000,
-        recordingChannels: Int = 1
+        recordingChannels: Int = 1,
+        themeID: String? = nil,
+        customAccentHex: String? = nil,
+        customAccentAltHex: String? = nil
     ) {
         self.vaultPath = vaultPath
         self.selectedModel = selectedModel
         self.subjects = subjects
         self.sampleRateHz = sampleRateHz
         self.recordingChannels = recordingChannels
+        self.themeID = themeID
+        self.customAccentHex = customAccentHex
+        self.customAccentAltHex = customAccentAltHex
     }
 }
 

@@ -1,8 +1,8 @@
 import SwiftUI
 import LectureRecorderCore
 
-/// A deliberately fixed dark, near-future look — this app always renders dark
-/// regardless of the system appearance, the way most pro audio/creative tools do.
+/// Always dark regardless of the system appearance, the way most pro audio/creative
+/// tools do. Accent and surface colors come from the selected `ThemePalette`.
 enum Theme {
     static let background = Color(red: 0.035, green: 0.04, blue: 0.055)
     static let backgroundGradient = LinearGradient(
@@ -10,28 +10,23 @@ enum Theme {
         startPoint: .top,
         endPoint: .bottom
     )
-    static let surface = Color(red: 0.075, green: 0.085, blue: 0.105)
-    static let surfaceElevated = Color(red: 0.105, green: 0.12, blue: 0.145)
+    static var surface: Color { ThemeState.palette.surface }
+    static var surfaceElevated: Color { ThemeState.palette.surfaceElevated }
     static let border = Color.white.opacity(0.09)
-    static let borderBright = Color.cyanGlow.opacity(0.4)
+    static var borderBright: Color { accent.opacity(0.4) }
 
     static let textPrimary = Color.white.opacity(0.94)
     static let textSecondary = Color.white.opacity(0.5)
     static let textTertiary = Color.white.opacity(0.32)
 
-    static let accent = Color.cyanGlow
-    static let accentAlt = Color.violetGlow
+    static var accent: Color { ThemeState.palette.accent }
+    static var accentAlt: Color { ThemeState.palette.accentAlt }
     static let danger = Color(red: 1.0, green: 0.36, blue: 0.42)
     static let warning = Color(red: 1.0, green: 0.72, blue: 0.3)
     static let success = Color(red: 0.3, green: 0.95, blue: 0.75)
 
     static let cornerRadius: CGFloat = 14
     static let smallCornerRadius: CGFloat = 9
-}
-
-extension Color {
-    static let cyanGlow = Color(red: 0.16, green: 0.92, blue: 0.85)
-    static let violetGlow = Color(red: 0.58, green: 0.48, blue: 1.0)
 }
 
 /// A translucent, faintly bordered panel — the base building block for every
