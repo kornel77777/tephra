@@ -22,6 +22,14 @@ struct SettingsView: View {
                     AppearancePicker()
                 }
 
+                SectionCard(title: "Mode") {
+                    ModePicker()
+                }
+
+                SectionCard(title: "Shortcuts") {
+                    ShortcutsEditor()
+                }
+
                 SectionCard(title: "Notes Folder") {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
@@ -281,5 +289,89 @@ private struct AppearancePicker: View {
                 }
             }
         }
+    }
+}
+
+private struct ModePicker: View {
+    @EnvironmentObject private var settings: SettingsStore
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Picker("", selection: Binding(
+                get: { UIMode(settings: settings.settings).rawValue },
+                set: { settings.settings.uiMode = $0 }
+            )) {
+                Text("Notch").tag(UIMode.notch.rawValue)
+                Text("Window").tag(UIMode.window.rawValue)
+            }
+            .labelsHidden()
+            .pickerStyle(.segmented)
+
+            Text("Notch tucks into the top of the screen with no Dock icon. Window is an ordinary window with a Dock icon. Your recordings and settings are the same either way.")
+                .font(.system(.caption, design: .rounded))
+                .foregroundStyle(Theme.textTertiary)
+        }
+    }
+}
+
+private struct ShortcutsEditor: View {
+    @EnvironmentObject private var settings: SettingsStore
+    @EnvironmentObject private var shortcuts: ShortcutController
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ForEach(ShortcutAction.allCases) { action in
+                HStack {
+                    Text(action.title)
+                        .font(.system(.callout, design: .rounded))
+                        .foregroundStyle(Theme.textPrimary)
+                    Spacer()
+                    Picker("", selection: binding(for: action)) {
+                        Text("Off").tag(ShortcutModifier?.none)
+                        ForEach(ShortcutModifier.allCases) { modifier in
+                            Text("Double-tap \(modifier.symbol) \(modifier.name)").tag(ShortcutModifier?.some(modifier))
+                        }
+                    }
+                    .labelsHidden()
+                    .frame(width: 200)
+                }
+            }
+
+            Text("Tap the key twice quickly, on its own — pressing any other key in between cancels it, so normal typing never triggers anything.")
+                .font(.system(.caption, design: .rounded))
+                .foregroundStyle(Theme.textTertiary)
+
+            if shortcuts.hasAccess {
+                Label("Active", systemImage: "checkmark.circle.fill")
+                    .font(.system(.caption, design: .rounded, weight: .medium))
+                    .foregroundStyle(Theme.success)
+            } else {
+                HStack(spacing: 10) {
+                    Text("Needs the Input Monitoring permission to see key taps in other apps.")
+                        .font(.system(.caption, design: .rounded))
+                        .foregroundStyle(Theme.warning)
+                    Spacer()
+                    Button("Grant access…") { shortcuts.requestAccess() }
+                        .buttonStyle(.glow(tint: Theme.warning))
+                }
+            }
+        }
+    }
+
+    /// Each modifier can drive only one action: picking it here switches it off elsewhere.
+    private func binding(for action: ShortcutAction) -> Binding<ShortcutModifier?> {
+        Binding(
+            get: { settings.settings.modifier(for: action) },
+            set: { newValue in
+                var updated = settings.settings
+                if let newValue {
+                    for other in ShortcutAction.allCases where other != action && updated.modifier(for: other) == newValue {
+                        updated.setModifier(nil, for: other)
+                    }
+                }
+                updated.setModifier(newValue, for: action)
+                settings.settings = updated
+            }
+        )
     }
 }

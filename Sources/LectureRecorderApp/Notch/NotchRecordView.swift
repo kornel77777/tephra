@@ -151,6 +151,7 @@ struct NotchRecordView: View {
         let selected = viewModel.selectedSubjectCode == subject.code
         return Button {
             viewModel.selectedSubjectCode = subject.code
+            settings.settings.lastSubjectCode = subject.code
         } label: {
             Text(subject.code)
                 .font(.system(.footnote, design: .rounded, weight: .semibold))

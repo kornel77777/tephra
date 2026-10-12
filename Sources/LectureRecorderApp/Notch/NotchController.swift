@@ -31,7 +31,8 @@ final class NotchPanel: NSPanel {
 @MainActor
 final class NotchController {
     private let env: AppEnvironment
-    private let vm = NotchViewModel()
+    private let vm: NotchViewModel
+    private var isActive = true
     private let panel = NotchPanel()
 
     private var screen: NSScreen
@@ -43,6 +44,7 @@ final class NotchController {
 
     init(env: AppEnvironment) {
         self.env = env
+        self.vm = env.notchVM
         screen = NSScreen.screens.first(where: \.hasNotch) ?? NSScreen.main ?? NSScreen.screens[0]
 
         let root = NotchRootView(vm: vm)
@@ -54,6 +56,7 @@ final class NotchController {
             .environmentObject(env.recordingViewModel)
             .environmentObject(vm)
             .environmentObject(ThemeStore.shared)
+            .environmentObject(env.shortcuts)
             .preferredColorScheme(.dark)
 
         let hosting = NSHostingView(rootView: root)
@@ -74,17 +77,44 @@ final class NotchController {
         ) { [weak self] _ in
             MainActor.assumeIsolated { self?.screenParametersChanged() }
         }
-
-        peek()
     }
 
     /// Opens the notch for a few seconds so the user can see where it lives
     /// (on launch, and when the app is opened again from Finder/Spotlight).
     func peek() {
+        guard isActive else { return }
         vm.isPinned = true
         expand(on: screen)
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
             self?.vm.isPinned = false
+        }
+    }
+
+    /// Window mode switches the notch off entirely (hidden, no hover detection).
+    func setActive(_ active: Bool) {
+        isActive = active
+        if active {
+            reposition()
+            panel.orderFrontRegardless()
+        } else {
+            cancelDwell()
+            vm.isPinned = false
+            collapse()
+            panel.orderOut(nil)
+        }
+    }
+
+    /// Keyboard shortcut: opens the notch and keeps it open (the cursor isn't over it), or closes it.
+    func toggleOpen() {
+        guard isActive else { return }
+        if vm.isExpanded {
+            vm.isPinned = false
+            collapse()
+        } else {
+            let mouse = NSEvent.mouseLocation
+            let target = NSScreen.screens.first { $0.frame.insetBy(dx: 0, dy: -1).contains(mouse) } ?? screen
+            vm.isPinned = true
+            expand(on: target)
         }
     }
 
@@ -155,7 +185,7 @@ final class NotchController {
         if event.type == .leftMouseDown {
             mouseDownPasteboardCount = NSPasteboard(name: .drag).changeCount
         }
-        guard !vm.isExpanded else { return }
+        guard isActive, !vm.isExpanded else { return }
 
         let mouse = NSEvent.mouseLocation
         guard let target = NSScreen.screens.first(where: { $0.frame.insetBy(dx: 0, dy: -1).contains(mouse) }) else {

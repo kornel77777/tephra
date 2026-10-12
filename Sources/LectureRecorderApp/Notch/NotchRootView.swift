@@ -4,7 +4,6 @@ import LectureRecorderCore
 struct NotchRootView: View {
     @ObservedObject var vm: NotchViewModel
     @EnvironmentObject private var recorder: AudioRecorder
-    @EnvironmentObject private var processor: TranscriptionQueueProcessor
     @EnvironmentObject private var themeStore: ThemeStore
 
     @State private var pulse = false
@@ -60,78 +59,9 @@ struct NotchRootView: View {
             notchWidth: realMetrics.notchWidth / NotchLayout.scale,
             notchHeight: realMetrics.notchHeight / NotchLayout.scale
         )
-        return VStack(spacing: 0) {
-            topBar(metrics: metrics)
-                .frame(height: max(metrics.notchHeight, 36))
-
-            Group {
-                switch vm.tab {
-                case .record: NotchRecordView()
-                case .library: LibraryView()
-                case .settings: SettingsView()
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-        .padding(.horizontal, (NotchLayout.ear + 10) / NotchLayout.scale)
-        .padding(.bottom, 14)
-    }
-
-    private func topBar(metrics: NotchMetrics) -> some View {
-        HStack(spacing: 6) {
-            ForEach(NotchTab.allCases) { tab in
-                tabButton(tab)
-            }
-
-            Spacer(minLength: metrics.hasNotch ? metrics.notchWidth + 28 : 12)
-
-            if processor.isProcessing {
-                HStack(spacing: 6) {
-                    ProgressView()
-                        .controlSize(.small)
-                        .tint(Theme.accent)
-                    Text("\(Int(processor.currentProgress * 100))%")
-                        .font(.system(.caption, design: .monospaced))
-                        .foregroundStyle(Theme.textSecondary)
-                }
-                .help("Transcribing…")
-            }
-
-            Button {
-                vm.isPinned.toggle()
-            } label: {
-                Image(systemName: vm.isPinned ? "pin.fill" : "pin")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(vm.isPinned ? Theme.accent : Theme.textTertiary)
-                    .frame(width: 28, height: 28)
-            }
-            .buttonStyle(.plain)
-            .help(vm.isPinned ? "Unpin" : "Keep open")
-        }
-    }
-
-    private func tabButton(_ tab: NotchTab) -> some View {
-        let selected = vm.tab == tab
-        return Button {
-            vm.tab = tab
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: tab.symbol)
-                    .font(.system(size: 13, weight: .medium))
-                if selected {
-                    Text(tab.title)
-                        .font(.system(.footnote, design: .rounded, weight: .semibold))
-                }
-            }
-            .foregroundStyle(selected ? Theme.accent : Theme.textSecondary)
-            .padding(.horizontal, selected ? 12 : 9)
-            .frame(height: 28)
-            .background(Capsule().fill(selected ? Theme.surfaceElevated : .clear))
-            .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-        .help(tab.title)
-        .animation(.easeOut(duration: 0.15), value: selected)
+        return AppContentView(metrics: metrics, showsPin: true)
+            .padding(.horizontal, (NotchLayout.ear + 10) / NotchLayout.scale)
+            .padding(.bottom, 14)
     }
 
     // MARK: - Collapsed recording indicator

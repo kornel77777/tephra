@@ -11,6 +11,13 @@ public struct AppSettings: Codable, Sendable {
     public var themeID: String?
     public var customAccentHex: String?
     public var customAccentAltHex: String?
+    /// "notch" (default) or "window".
+    public var uiMode: String?
+    /// Which modifier key, double-tapped, triggers each action ("control", "option", "shift", "command", "off").
+    public var shortcutOpen: String?
+    public var shortcutRecord: String?
+    public var shortcutPause: String?
+    public var lastSubjectCode: String?
 
     public init(
         vaultPath: String? = nil,
@@ -20,7 +27,12 @@ public struct AppSettings: Codable, Sendable {
         recordingChannels: Int = 1,
         themeID: String? = nil,
         customAccentHex: String? = nil,
-        customAccentAltHex: String? = nil
+        customAccentAltHex: String? = nil,
+        uiMode: String? = nil,
+        shortcutOpen: String? = nil,
+        shortcutRecord: String? = nil,
+        shortcutPause: String? = nil,
+        lastSubjectCode: String? = nil
     ) {
         self.vaultPath = vaultPath
         self.selectedModel = selectedModel
@@ -30,6 +42,11 @@ public struct AppSettings: Codable, Sendable {
         self.themeID = themeID
         self.customAccentHex = customAccentHex
         self.customAccentAltHex = customAccentAltHex
+        self.uiMode = uiMode
+        self.shortcutOpen = shortcutOpen
+        self.shortcutRecord = shortcutRecord
+        self.shortcutPause = shortcutPause
+        self.lastSubjectCode = lastSubjectCode
     }
 }
 

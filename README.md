@@ -86,6 +86,26 @@ opens by itself so you can drop it in. Open the app again from Finder or
 Spotlight if you lose it, and it'll peek out for a few seconds. Quit lives
 at the bottom of the Settings tab.
 
+### Notch or window
+
+Settings → Mode switches between the notch and an ordinary window (with a Dock
+icon). Same tabs, same data either way.
+
+### Keyboard shortcuts
+
+Double-tap a modifier key on its own, from any app (pressing any other key in
+between cancels it, so typing and ⌘C etc. never trigger anything). Defaults:
+
+- Double-tap ⌥ Option — open / close the notch (or show / hide the window)
+- Double-tap ⌃ Control — start / stop recording (starts with the last subject you used)
+- Double-tap ⇧ Shift — pause / resume
+
+All three can be remapped or turned off in Settings → Shortcuts. Seeing key
+presses in other apps needs macOS's **Input Monitoring** permission (System
+Settings → Privacy & Security); Settings shows whether it's granted. Note that
+ad-hoc signed builds look like a new app to macOS every time they're rebuilt,
+so the permission (and the microphone one) has to be granted again after a rebuild.
+
 ## First run
 
 Takes a minute to get going:
